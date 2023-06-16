@@ -1,1 +1,0 @@
-Dream Chaser, an AI imaging mobile app
