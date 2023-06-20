@@ -1,4 +1,4 @@
-flan-t5-base/
+gpt2-650k-stable-diffusion-prompt-generator/
 openjourney/
 samples/
 config.py
