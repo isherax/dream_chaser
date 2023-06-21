@@ -1,4 +1,4 @@
-from diffusers import DiffusionPipeline
+from diffusers import StableDiffusionPipeline
 import argparse
 import torch
 import transformers
@@ -8,7 +8,7 @@ import warnings
 
 class DreamChaserAPI:
     def __init__(self, image_model_id, text_model_id):
-        self.image_pipeline = DiffusionPipeline.from_pretrained(image_model_id)
+        self.image_pipeline = StableDiffusionPipeline.from_pretrained(image_model_id)
         self.text_pipeline = transformers.pipeline('text-generation', model=text_model_id)
         
         if torch.cuda.device_count() > 0:
@@ -24,17 +24,15 @@ class DreamChaserAPI:
 
 
 if __name__ == '__main__':
-    image_model = './openjourney'
+    image_model = './openjourney-v4'
     text_model = './gpt2-650k-stable-diffusion-prompt-generator'
     api = DreamChaserAPI(image_model, text_model)
+    
     parser = argparse.ArgumentParser()
     parser.add_argument('--p', '--prompt', required=True)
     args = parser.parse_args()
+    images = api.image_pipeline(args.p).images
     
-    new_prompt = api.improve_prompt(args.p)
-    print(new_prompt)
-    images = api.image_pipeline(new_prompt).images
-    
-    for i in range(len(images)):
+    for image in images:
         temp_file = uuid.uuid4().hex
-        images[i].save(f'samples/{temp_file}.png')
+        image.save(f'samples/{temp_file}.png')
