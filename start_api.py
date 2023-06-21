@@ -1,6 +1,7 @@
 from diffusers import StableDiffusionPipeline
-from flask import Flask
+from flask import Flask, send_file
 from flask_restful import Resource, Api, reqparse
+import io
 import torch
 import transformers
 import warnings
@@ -8,8 +9,8 @@ import warnings
 
 class DreamChaserAPI(Resource):
     def __init__(self):
-        self.__name__ = 'DreamChaserAPI'        
-
+        self.__name__ = 'DreamChaserAPI'
+        
             
     @classmethod
     def setup_models(self, image_model_id, text_model_id):
@@ -28,9 +29,13 @@ class DreamChaserAPI(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('prompt', required=True)
         args = parser.parse_args()
-        images = self.image_pipeline(args['prompt']).images
         
-        return images, 200
+        image = self.image_pipeline(args['prompt']).images[0]
+        image_object = io.BytesIO()
+        image.save(image_object, 'PNG')
+        image_object.seek(0)
+        
+        return send_file(image_object, mimetype='image/PNG')
     
 
 if __name__ == '__main__':
