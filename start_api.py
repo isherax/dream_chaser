@@ -23,14 +23,27 @@ class DreamChaserAPI(Resource):
             warnings.warn('GPU not found, image generation will be substantially slower.', RuntimeWarning)
             
         return self
+    
+    
+    def enhance_prompt(self, input_text):
+        text = self.text_pipeline(input_text, max_length=80)[0]['generated_text']
+        text = ' '.join(text.split(' ')[:-1 or None])
+        
+        return text
             
             
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('prompt', required=True)
+        parser.add_argument('enhance_prompt', default=True)
         args = parser.parse_args()
         
-        image = self.image_pipeline(args['prompt']).images[0]
+        if args['enhance_prompt']:
+            final_prompt = self.enhance_prompt(args['prompt'])
+        else:
+            final_prompt = args['prompt']
+        
+        image = self.image_pipeline(final_prompt).images[0]
         image_object = io.BytesIO()
         image.save(image_object, 'PNG')
         image_object.seek(0)
