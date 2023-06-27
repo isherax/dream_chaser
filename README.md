@@ -15,5 +15,5 @@ A backend server for multilevel AI imaging.
 # API Requests
 
 1. `\image`: Generate an image using the AI text-to-image model. Returns a png object in bytes form.
-    a. `prompt` (required): Input text for image prompt.
-    b. `enhance_prompt` (optional): Boolean variable to improve prompt using prompt generation model. Set to true by default.
+    1. `prompt` (required): Input text for image prompt.
+    2. `enhance_prompt` (optional): Boolean variable to improve prompt using prompt generation model. Set to true by default.
