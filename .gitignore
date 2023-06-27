@@ -1,3 +1,4 @@
 all-MiniLM-L6-v2/
-gpt2-650k-stable-diffusion-prompt-generator/
+distilgpt2/
+distilgpt2-stable-diffusion-v2/
 openjourney-v4/

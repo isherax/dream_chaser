@@ -2,9 +2,9 @@ from diffusers import StableDiffusionPipeline
 from flask import Flask, send_file
 from flask_restful import Resource, Api, reqparse
 from sentence_transformers import SentenceTransformer, util
+from transformers import GPT2Tokenizer, GPT2LMHeadModel
 import io
 import torch
-import transformers
 import warnings
 
 
@@ -14,9 +14,11 @@ class DreamChaserAPI(Resource):
         
             
     @classmethod
-    def setup_models(self, image_model_id, prompt_model_id, similarity_model_id):
+    def setup_models(self, image_model_id, prompt_model_id, prompt_tokenizer_id, similarity_model_id):
         self.image_pipeline = StableDiffusionPipeline.from_pretrained(image_model_id) 
-        self.prompt_pipeline = transformers.pipeline('text-generation', model=prompt_model_id)
+        self.prompt_model = GPT2LMHeadModel.from_pretrained(prompt_model_id)
+        self.prompt_tokenizer = GPT2Tokenizer.from_pretrained(prompt_tokenizer_id)
+        self.prompt_tokenizer.add_special_tokens({'pad_token': '[PAD]'})
         self.similarity_model = SentenceTransformer(similarity_model_id)
         
         if torch.cuda.device_count() > 0:
@@ -28,24 +30,32 @@ class DreamChaserAPI(Resource):
         return self
     
     
-    def enhance_prompt(self, input_text, num_gens=5):
-        input_embeddings = self.similarity_model.encode(input_text, convert_to_tensor=True)
-        new_prompt = input_text
+    def enhance_prompt(self, input_text, temperature=0.9, top_k=8, max_length=80, repetition_penalty=1.2, num_return_sequences=5):
+        best_prompt = input_text
         max_similarity = 0
+        input_embeddings = self.similarity_model.encode(input_text, convert_to_tensor=True)
+        input_ids = self.prompt_tokenizer(input_text, return_tensors='pt').input_ids
+        new_prompts = self.prompt_model.generate(input_ids, 
+                                                 do_sample=True, 
+                                                 temperature=temperature, 
+                                                 top_k=top_k, 
+                                                 max_length=max_length, 
+                                                 num_return_sequences=num_return_sequences, 
+                                                 repetition_penalty=repetition_penalty, 
+                                                 penalty_alpha=0.6, 
+                                                 no_repeat_ngram_size=1, 
+                                                 early_stopping=True)
         
-        for i in range(num_gens):
-            text = self.prompt_pipeline(input_text, 
-                                        max_length=77, 
-                                        pad_token_id=self.prompt_pipeline.tokenizer.eos_token_id)[0]['generated_text']
-            text = ' '.join(text.split(' ')[:-1 or None])
+        for i in range(len(new_prompts)):
+            text = self.prompt_tokenizer.decode(new_prompts[i], skip_special_tokens=True)
             new_embeddings = self.similarity_model.encode(text, convert_to_tensor=True)
             cos_score = util.cos_sim(input_embeddings, new_embeddings).numpy()[0][0]
             
             if cos_score > max_similarity:
                 max_similarity = cos_score
-                new_prompt = text
+                best_prompt = text
         
-        return new_prompt
+        return best_prompt
             
             
     def post(self):
@@ -69,9 +79,13 @@ class DreamChaserAPI(Resource):
 
 if __name__ == '__main__':
     image_model_folder = './openjourney-v4'
-    text_model_folder = './gpt2-650k-stable-diffusion-prompt-generator'
+    prompt_model_folder = './distilgpt2-stable-diffusion-v2'
+    prompt_tokenizer_folder = './distilgpt2'
     similarity_model_folder = './all-MiniLM-L6-v2'
-    dca = DreamChaserAPI.setup_models(image_model_folder, text_model_folder, similarity_model_folder)
+    dca = DreamChaserAPI.setup_models(image_model_folder, 
+                                      prompt_model_folder,
+                                      prompt_tokenizer_folder,
+                                      similarity_model_folder)
     app = Flask(__name__)
     api = Api(app)
     api.add_resource(dca, '/image')
