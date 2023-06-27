@@ -34,7 +34,9 @@ class DreamChaserAPI(Resource):
         max_similarity = 0
         
         for i in range(num_gens):
-            text = self.prompt_pipeline(input_text, max_length=77, )[0]['generated_text']
+            text = self.prompt_pipeline(input_text, 
+                                        max_length=77, 
+                                        pad_token_id=self.prompt_pipeline.tokenizer.eos_token_id)[0]['generated_text']
             text = ' '.join(text.split(' ')[:-1 or None])
             new_embeddings = self.similarity_model.encode(text, convert_to_tensor=True)
             cos_score = util.cos_sim(input_embeddings, new_embeddings).numpy()[0][0]
@@ -42,7 +44,6 @@ class DreamChaserAPI(Resource):
             if cos_score > max_similarity:
                 max_similarity = cos_score
                 new_prompt = text
-            
         
         return new_prompt
             
