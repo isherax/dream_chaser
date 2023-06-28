@@ -44,14 +44,15 @@ class TextAPI(Resource):
         
         return best_prompt
     
+    
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('prompt', required=True)
-        parser.add_argument('temperature', default=0.9)
-        parser.add_argument('top_k', default=8)
-        parser.add_argument('max_length', default=77)
-        parser.add_argument('repetition_penalty', default=1.2)
-        parser.add_argument('num_return_sequences', default=5)
+        parser.add_argument('temperature', type=float, default=0.9)
+        parser.add_argument('top_k', type=int, default=8)
+        parser.add_argument('max_length', type=int, default=77)
+        parser.add_argument('repetition_penalty', type=float, default=1.2)
+        parser.add_argument('num_return_sequences', type=int, default=5)
         args = parser.parse_args()
         
         new_prompt = self.enhance_prompt(args['prompt'], 

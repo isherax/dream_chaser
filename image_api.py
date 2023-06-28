@@ -26,12 +26,12 @@ class ImageAPI(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('prompt', required=True)
-        parser.add_argument('height', default=256)
-        parser.add_argument('width', default=256)
-        parser.add_argument('num_inference_steps', default=50)
-        parser.add_argument('guidance_scale', default=7.5)
+        parser.add_argument('height', type=int, default=512)
+        parser.add_argument('width', type=int, default=512)
+        parser.add_argument('num_inference_steps', type=int, default=50)
+        parser.add_argument('guidance_scale', type=float, default=7.5)
         parser.add_argument('negative_prompt', default='')
-        parser.add_argument('num_images_per_prompt', default=1)
+        parser.add_argument('num_images_per_prompt', type=int, default=1)
         args = parser.parse_args()
         
         image = self.image_pipeline(args['prompt'],
