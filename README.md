@@ -17,4 +17,16 @@ A backend server for multilevel AI imaging.
 
 1. `\image`: Generate an image using the AI text-to-image model. Returns a png object in bytes form.
     1. `prompt` (required): Input text for image prompt.
-    2. `enhance_prompt` (optional): Boolean variable to improve prompt using prompt generation model. Set to true by default.
+    2. `height`:
+    3. `width`:
+    4. `num_inference_steps`:
+    5. `guidance_scale`:
+    6. `negative_prompt`:
+    7. `num_images_per_prompt`:
+2. `\text`: Improve a prompt using the AI text generation model. Returns a string.
+    1. `prompt` (required):
+    2. `temperature`:
+    3. `top_k`:
+    4. `max_length`:
+    5. `repetition_penalty`:
+    6. `num_return_sequences`:
