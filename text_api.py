@@ -52,7 +52,8 @@ class TextAPI(Resource):
         parser.add_argument('max_length', default=77)
         parser.add_argument('repetition_penalty', default=1.2)
         parser.add_argument('num_return_sequences', default=5)
-        args = parser.parse_args()   
+        args = parser.parse_args()
+        
         new_prompt = self.enhance_prompt(args['prompt'], 
                                          args['temperature'], 
                                          args['top_k'], 
