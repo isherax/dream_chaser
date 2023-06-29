@@ -2,7 +2,7 @@ from sentence_transformers import SentenceTransformer, util
 from flask_restful import Resource, reqparse
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
 
-class TextAPI(Resource):
+class TextGen(Resource):
     def __init__(self):
         self.__name__ = 'DreamChaserTextAPI'
         

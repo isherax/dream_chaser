@@ -6,7 +6,7 @@ from warnings import warn
 import torch
 
 
-class ImageAPI(Resource):
+class ImageGen(Resource):
     def __init__(self):
         self.__name__ = 'DreamChaserAPI'
         
