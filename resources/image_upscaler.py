@@ -1,49 +1,45 @@
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionUpscalePipeline
 from flask import send_file
 from flask_restful import Resource, reqparse
 from io import BytesIO
+from PIL import Image
 from warnings import warn
+import requests
 import torch
 
 
-class ImageGen(Resource):
+class ImageUpscaler(Resource):
     def __init__(self):
-        self.__name__ = 'DreamChaserImageAPI'
+        self.__name__ = 'DreamChaserUpscalerAPI'
         
             
     @classmethod
-    def setup_models(self, image_model_id):
-        self.image_pipeline = StableDiffusionPipeline.from_pretrained(image_model_id) 
+    def setup_models(self, upscaler_id):
+        self.upscaler_pipeline = StableDiffusionUpscalePipeline.from_pretrained(upscaler_id) 
         
         if torch.cuda.device_count() > 0:
-            self.image_pipeline.to('cuda')
+            self.upscaler_pipeline.to('cuda')
         else:
             warn('GPU not found, image generation will be substantially slower.', RuntimeWarning)
             
         return self
-            
-            
+
     def get(self):
         parser = reqparse.RequestParser()
+        parser.add_argument('url', required=True, location='args')
         parser.add_argument('prompt', required=True, location='args')
-        parser.add_argument('height', type=int, default=512, location='args')
-        parser.add_argument('width', type=int, default=512, location='args')
         parser.add_argument('num_inference_steps', type=int, default=50, location='args')
         parser.add_argument('guidance_scale', type=float, default=7.5, location='args')
         parser.add_argument('negative_prompt', default='', location='args')
         parser.add_argument('num_images_per_prompt', type=int, default=1, location='args')
         args = parser.parse_args()
         
-        image = self.image_pipeline(args['prompt'],
-                                    args['height'],
-                                    args['width'],
-                                    args['num_inference_steps'],
-                                    args['guidance_scale'],
-                                    args['negative_prompt'],
-                                    args['num_images_per_prompt']).images[0]
+        response = requests.get(args['url'])
+        original_image = Image.open(BytesIO(response.content)).convert('RGB')
+        upscaled_image = self.upscaler_pipeline(prompt=args['prompt'], image=original_image).images[0]
         image_object = BytesIO()
-        image.save(image_object, 'PNG')
+        upscaled_image.save(image_object, 'PNG')
         image_object.seek(0)
         
         return send_file(image_object, mimetype='image/PNG')
-    
+        

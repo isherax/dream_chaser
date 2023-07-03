@@ -15,7 +15,7 @@ A backend server for multilevel AI imaging.
 
 # API Requests
 
-1. `\image`: Generate an image using the AI text-to-image model. Returns a png object in bytes form.
+1. `\image_gen`: Generate an image using the AI text-to-image model. Returns a png object in bytes form.
     1. `prompt` (required): input text for image generation model
     2. `height`: height of image in pixels
     3. `width`: width of image in pixels
@@ -23,7 +23,14 @@ A backend server for multilevel AI imaging.
     5. `guidance_scale`: guidance scale
     6. `negative_prompt`: prompts to avoid in image generation
     7. `num_images_per_prompt`: number of images to return
-2. `\text`: Improve a prompt using the AI text generation model. Returns a string.
+2. `\image_upscale`: Upscale an image using the AI upscaler model. Returns a png object in bytes form.
+    1. `url` (required): location of input image for upscaler model 
+    2. `prompt` (required): input text for upscaler model
+    3. `num_inference_steps`
+    4. `guidance_scale`
+    5. `negative_prompt`
+    6. `num_images_per_prompt`
+3. `\text_gen`: Improve a prompt using the AI text generation model. Returns a string.
     1. `prompt` (required): input text for text generation model
     2. `temperature`: diversity of prompt results
     3. `top_k`: number of tokens to sample at each step
