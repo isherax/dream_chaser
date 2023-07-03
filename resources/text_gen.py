@@ -55,12 +55,12 @@ class TextGen(Resource):
         parser.add_argument('num_return_sequences', type=int, default=5, location='args')
         args = parser.parse_args()
         
-        new_prompt = self.enhance_prompt(args['prompt'], 
-                                         args['temperature'], 
-                                         args['top_k'], 
-                                         args['max_length'], 
-                                         args['repetition_penalty'], 
-                                         args['num_return_sequences'])
+        new_prompt = self.enhance_prompt(prompt=args['prompt'], 
+                                         temperature=args['temperature'], 
+                                         top_k=args['top_k'], 
+                                         max_length=args['max_length'], 
+                                         repetition_penalty=args['repetition_penalty'], 
+                                         num_return_sequences=args['num_return_sequences'])
         
         return new_prompt
     

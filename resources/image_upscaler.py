@@ -36,7 +36,12 @@ class ImageUpscaler(Resource):
         
         response = requests.get(args['url'])
         original_image = Image.open(BytesIO(response.content)).convert('RGB')
-        upscaled_image = self.upscaler_pipeline(prompt=args['prompt'], image=original_image).images[0]
+        upscaled_image = self.upscaler_pipeline(prompt=args['prompt'], 
+                                                image=original_image,
+                                                num_inference_steps=args['num_inference_steps'],
+                                                guidance_scale=args['guidance_scale'],
+                                                negative_prompt=args['negative_prompt'],
+                                                num_images_per_prompt=args['num_images_per_prompt']).images[0]
         image_object = BytesIO()
         upscaled_image.save(image_object, 'PNG')
         image_object.seek(0)

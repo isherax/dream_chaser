@@ -34,13 +34,13 @@ class ImageGen(Resource):
         parser.add_argument('num_images_per_prompt', type=int, default=1, location='args')
         args = parser.parse_args()
         
-        image = self.image_pipeline(args['prompt'],
-                                    args['height'],
-                                    args['width'],
-                                    args['num_inference_steps'],
-                                    args['guidance_scale'],
-                                    args['negative_prompt'],
-                                    args['num_images_per_prompt']).images[0]
+        image = self.image_pipeline(prompt=args['prompt'],
+                                    height=args['height'],
+                                    width=args['width'],
+                                    num_inference_steps=args['num_inference_steps'],
+                                    guidance_scale=args['guidance_scale'],
+                                    negative_prompt=args['negative_prompt'],
+                                    num_images_per_prompt=args['num_images_per_prompt']).images[0]
         image_object = BytesIO()
         image.save(image_object, 'PNG')
         image_object.seek(0)

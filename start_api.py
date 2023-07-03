@@ -14,7 +14,7 @@ if __name__ == '__main__':
     image_generator = ImageGen.setup_models(image_gen_folder)
     image_upscaler = ImageUpscaler.setup_models(image_upscaler_folder)
     text_generator = TextGen.setup_models(prompt_gen_folder, prompt_tokenizer_folder, similarity_model_folder)
-    app = Flask(__name__)
+    app = Flask('DreamChaserAPI')
     api = Api(app)
     api.add_resource(image_generator, '/image_gen')
     api.add_resource(image_upscaler, '/image_upscaler')
