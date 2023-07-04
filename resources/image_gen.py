@@ -25,12 +25,12 @@ class ImageGen(Resource):
             
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('prompt', required=True, location='args')
+        parser.add_argument('prompt', type=str, required=True, location='args')
         parser.add_argument('height', type=int, default=512, location='args')
         parser.add_argument('width', type=int, default=512, location='args')
         parser.add_argument('num_inference_steps', type=int, default=50, location='args')
         parser.add_argument('guidance_scale', type=float, default=7.5, location='args')
-        parser.add_argument('negative_prompt', default='', location='args')
+        parser.add_argument('negative_prompt', type=str, default='', location='args')
         parser.add_argument('num_images_per_prompt', type=int, default=1, location='args')
         args = parser.parse_args()
         

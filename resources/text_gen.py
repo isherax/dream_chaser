@@ -47,7 +47,7 @@ class TextGen(Resource):
     
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('prompt', required=True, location='args')
+        parser.add_argument('prompt', type=str, required=True, location='args')
         parser.add_argument('temperature', type=float, default=0.9, location='args')
         parser.add_argument('top_k', type=int, default=8, location='args')
         parser.add_argument('max_length', type=int, default=77, location='args')
