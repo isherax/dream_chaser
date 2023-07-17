@@ -6,7 +6,7 @@ from resources.text_gen import TextGen
     
 
 if __name__ == '__main__':
-    image_gen_folder = './openjourney-v4'
+    image_gen_folder = './stable-diffusion-2-1-base'
     image_upscaler_folder= './stable-diffusion-x4-upscaler'
     prompt_gen_folder = './distilgpt2-stable-diffusion-v2'
     prompt_tokenizer_folder = './distilgpt2'

@@ -6,6 +6,7 @@ class TextGen(Resource):
     def __init__(self):
         self.__name__ = 'DreamChaserTextAPI'
         
+        
     @classmethod
     def setup_models(self, prompt_model_id, prompt_tokenizer_id, similarity_model_id):
         self.prompt_model = GPT2LMHeadModel.from_pretrained(prompt_model_id)
@@ -36,7 +37,7 @@ class TextGen(Resource):
         for new_prompt in new_prompts:
             text = self.prompt_tokenizer.decode(new_prompt, skip_special_tokens=True)
             new_embeddings = self.similarity_model.encode(text, convert_to_tensor=True)
-            cos_score = util.cos_sim(input_embeddings, new_embeddings).numpy()[0][0]
+            cos_score = util.cos_sim(input_embeddings, new_embeddings)[0][0]
             
             if cos_score > max_similarity:
                 max_similarity = cos_score
@@ -55,7 +56,7 @@ class TextGen(Resource):
         parser.add_argument('num_return_sequences', type=int, default=5, location='args')
         args = parser.parse_args()
         
-        new_prompt = self.enhance_prompt(prompt=args['prompt'], 
+        new_prompt = self.enhance_prompt(input_text=args['prompt'], 
                                          temperature=args['temperature'], 
                                          top_k=args['top_k'], 
                                          max_length=args['max_length'], 
