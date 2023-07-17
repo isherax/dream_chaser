@@ -3,12 +3,14 @@ from flask import send_file
 from flask_restful import Resource, reqparse
 from io import BytesIO
 from warnings import warn
+import requests
 import torch
 
 
 class ImageGen(Resource):
     def __init__(self):
         self.__name__ = 'DreamChaserImageAPI'
+        self.text_url = 'http://127.0.0.1:5000/text_gen'
         
             
     @classmethod
@@ -26,6 +28,7 @@ class ImageGen(Resource):
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('prompt', type=str, required=True, location='args')
+        parser.add_argument('enhance', type=bool, default=True, location='args')
         parser.add_argument('height', type=int, default=512, location='args')
         parser.add_argument('width', type=int, default=512, location='args')
         parser.add_argument('num_inference_steps', type=int, default=50, location='args')
@@ -34,7 +37,13 @@ class ImageGen(Resource):
         parser.add_argument('num_images_per_prompt', type=int, default=1, location='args')
         args = parser.parse_args()
         
-        image = self.image_pipeline(prompt=args['prompt'],
+        if args['enhance']:
+            get_request = requests.get(self.text_url, params={'prompt': args['prompt']})
+            final_prompt = get_request.text
+        else:
+            final_prompt = args['prompt']
+        
+        image = self.image_pipeline(prompt=final_prompt,
                                     height=args['height'],
                                     width=args['width'],
                                     num_inference_steps=args['num_inference_steps'],
